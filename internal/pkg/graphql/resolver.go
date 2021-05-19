@@ -5,8 +5,8 @@ import (
 	"context"
 	"math"
 
-	"github.com/iot-for-tillgenglighet/api-snowdepth/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-snowdepth/pkg/models"
+	"github.com/diwise/api-snowdepth/pkg/database"
+	"github.com/diwise/api-snowdepth/pkg/models"
 )
 
 type Resolver struct{}

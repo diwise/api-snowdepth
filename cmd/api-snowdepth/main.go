@@ -5,10 +5,10 @@ import (
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 
-	"github.com/iot-for-tillgenglighet/api-snowdepth/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-snowdepth/pkg/handler"
-	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging"
-	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging/telemetry"
+	"github.com/diwise/api-snowdepth/pkg/database"
+	"github.com/diwise/api-snowdepth/pkg/handler"
+	"github.com/diwise/messaging-golang/pkg/messaging"
+	"github.com/diwise/messaging-golang/pkg/messaging/telemetry"
 )
 
 func main() {
