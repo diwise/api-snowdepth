@@ -4,7 +4,7 @@ This service is responsible for storing snowdepth telemetry and provide it to co
 
 # Building and tagging with Docker
 
-`docker build -f deployments/Dockerfile -t iot-for-tillgenglighet/api-snowdepth:latest .`
+`docker build -f deployments/Dockerfile -t diwise/api-snowdepth:latest .`
 
 # Build for local testing with Docker Compose
 

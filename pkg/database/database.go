@@ -13,7 +13,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 
-	"github.com/iot-for-tillgenglighet/api-snowdepth/pkg/models"
+	"github.com/diwise/api-snowdepth/pkg/models"
 )
 
 //Datastore is an interface that is used to inject the database into different handlers to improve testability

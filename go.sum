@@ -18,6 +18,10 @@ github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd h1:83Wprp6RO
 github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
 github.com/dgryski/trifles v0.0.0-20190318185328-a8d75aae118c h1:TUuUh0Xgj97tLMNtWtNvI9mIV6isjEb9lBMNv+77IGM=
 github.com/dgryski/trifles v0.0.0-20190318185328-a8d75aae118c/go.mod h1:if7Fbed8SFyPtHLHbg49SI7NAdJiC5WIA09pe59rfAA=
+github.com/diwise/messaging-golang v0.0.0-20210519125901-747dbe4d4b42 h1:1pTPqRYlH1Q18wMLFuek3PfxaNNHTxbNtkfFHMeWZwI=
+github.com/diwise/messaging-golang v0.0.0-20210519125901-747dbe4d4b42/go.mod h1:tXC8qL64QBI34uRpdbX+LUwoGjgIp1bqpecfBvIYkTw=
+github.com/diwise/ngsi-ld-golang v0.0.0-20210519125641-0cb62633de46 h1:AgXJHQe+IgPaZ4u5YFtXohcv65JfXfYHnq1mFAoRq30=
+github.com/diwise/ngsi-ld-golang v0.0.0-20210519125641-0cb62633de46/go.mod h1:3FPU/KnkLJTOttYoYnyxeeNa2Pco8nhPXrhspF7qtXM=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 h1:Yzb9+7DPaBjB8zlTR87/ElzFsnQfuHnVUVqpZZIcV5Y=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5/go.mod h1:a2zkGnVExMxdzMo3M0Hi/3sEU+cWnZpSni0O6/Yb/P0=
 github.com/go-chi/chi v3.3.2+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
@@ -37,10 +41,6 @@ github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/ad
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.4 h1:YDjusn29QI/Das2iO9M0BHnIbxPeyuCHsjMW+lJfyTc=
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
-github.com/iot-for-tillgenglighet/messaging-golang v0.0.0-20201230002037-e79e8e927ae9 h1:Rit6Sdi481yS0aszBLqZlr70H3K5d3tvu22I0OjfwrA=
-github.com/iot-for-tillgenglighet/messaging-golang v0.0.0-20201230002037-e79e8e927ae9/go.mod h1:KAWin6BX41/tyhpYYff1UgOEz5ShtDLEmQ9naYUiC0c=
-github.com/iot-for-tillgenglighet/ngsi-ld-golang v0.0.0-20210428182818-57cd305d8a34 h1:lAntihXDvxAIXpXUy2eWxvLC8NSpqxEAWhH3YA6j9Ig=
-github.com/iot-for-tillgenglighet/ngsi-ld-golang v0.0.0-20210428182818-57cd305d8a34/go.mod h1:cIbwqe96AYjHMj6nIth2RlcoOyrju81almGfQyVYAlM=
 github.com/jinzhu/gorm v1.9.16 h1:+IyIjPEABKRpsu/F8OvDPy9fyQlgsg2luMV2ZIH5i5o=
 github.com/jinzhu/gorm v1.9.16/go.mod h1:G3LB3wezTOWM2ITLzPxEXgSkOXAntiLHS7UdBefADcs=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
