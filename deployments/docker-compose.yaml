@@ -70,10 +70,7 @@ services:
     
   
   postgresdb:
-    image: 'diwise/testdb-postgres:latest'
-    build:
-      context: ..
-      dockerfile: ./test/database/testdb-dockerfile
+    image: 'ghcr.io/diwise/test-db-postgresql:prod-824e7cffd65dd3766c88441a48cffd5b2acd55f2'
     restart: always
     environment:
       POSTGRES_DB: 'snowdepth'
