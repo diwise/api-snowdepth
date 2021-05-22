@@ -29,6 +29,12 @@ services:
     image: 'docker.pkg.github.com/diwise/iot-device-registry/iot-device-registry:prod-80fc3d1307891da2494602f8b3766bcef59a7811'
     restart: always
     environment:
+      DIWISE_SQLDB_HOST: 'postgresdb'
+      DIWISE_SQLDB_USER: 'testuser'
+      DIWISE_SQLDB_NAME: 'snowdepth'
+      DIWISE_SQLDB_PASSWORD: 'testpass'
+      DIWISE_SQLDB_SSLMODE: 'disable'
+      RABBITMQ_HOST: 'rabbitmq'
       SERVICE_PORT: '8990'
 
     ports:
