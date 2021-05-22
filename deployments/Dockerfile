@@ -1,5 +1,7 @@
 FROM golang:1.16 AS builder
 
+LABEL org.opencontainers.image.source https://github.com/diwise/api-snowdepth
+
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
