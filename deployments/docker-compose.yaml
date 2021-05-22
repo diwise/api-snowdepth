@@ -26,7 +26,7 @@ services:
 
 
   deviceregistry:
-    image: 'docker.pkg.github.com/diwise/iot-device-registry/iot-device-registry:prod-80fc3d1307891da2494602f8b3766bcef59a7811'
+    image: 'ghcr.io/diwise/iot-device-registry:prod-80fc3d1307891da2494602f8b3766bcef59a7811'
     restart: always
     environment:
       DIWISE_SQLDB_HOST: 'postgresdb'
@@ -42,7 +42,7 @@ services:
 
 
   federation:
-    image: 'docker.pkg.github.com/diwise/api-graphql/api-graphql:prod-10f7bb569256a100d2d6df73c12ddc31c30f14c5'
+    image: 'ghcr.io/diwise/api-graphql:prod-10f7bb569256a100d2d6df73c12ddc31c30f14c5'
     restart: always
     environment:
       API_GQL_FEDERATION_PORT: '8989'
@@ -52,7 +52,7 @@ services:
 
 
   ingress:
-    image: 'docker.pkg.github.com/diwise/ingress-mqtt/ingress-mqtt:prod-353b078e5db37a6e681ee67b21cf16e41703da70'
+    image: 'ghcr.io/diwise/ingress-mqtt:prod-353b078e5db37a6e681ee67b21cf16e41703da70'
     restart: always
     depends_on:
       - snowdepth
