@@ -140,6 +140,11 @@ func CreateRouterAndStartServing(db database.Datastore) {
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
+	regex = "^urn:ngsi-ld:TrafficFlowObserved:.+"
+	registration, _ = ngsi.NewCsourceRegistration("TrafficFlowObserved", []string{}, remoteURL, &regex)
+	contextSource, _ = ngsi.NewRemoteContextSource(registration)
+	contextRegistry.Register(contextSource)
+
 	remoteURL = os.Getenv("NGSI_CTX_SRC_DEVICES")
 	regex = "^urn:ngsi-ld:Device:.+"
 	registration, _ = ngsi.NewCsourceRegistration("Device", []string{"value"}, remoteURL, &regex)
