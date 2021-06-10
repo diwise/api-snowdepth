@@ -3,9 +3,11 @@ package handler
 import (
 	"compress/flate"
 	"errors"
+	"io"
 	"math"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -84,6 +86,7 @@ func newRequestRouter() *RequestRouter {
 	compressor := middleware.NewCompressor(flate.DefaultCompression, "application/json", "application/ld+json", "application/geo+json")
 	router.impl.Use(compressor.Handler)
 	router.impl.Use(middleware.Logger)
+	router.impl.Use(newApiKeyMiddleware().Handler)
 
 	return router
 }
@@ -229,4 +232,50 @@ func (cs contextSource) UpdateEntityAttributes(entityID string, req ngsi.Request
 
 func (cs contextSource) RetrieveEntity(entityID string, req ngsi.Request) (ngsi.Entity, error) {
 	return nil, errors.New("RetrieveEntity is not supported")
+}
+
+type ApiKey struct {
+	enabled bool
+	key     string
+}
+
+func newApiKeyMiddleware() *ApiKey {
+	a := &ApiKey{
+		enabled: false,
+		key: "",
+	}
+
+	if b, err := strconv.ParseBool(os.Getenv("DIWISE_REQUIRE_API_KEY")); err == nil {
+		if b {
+			a.enabled = true
+			validKey := os.Getenv("DIWISE_API_KEY")
+
+			if len(validKey) != 0 {
+				a.key = validKey
+			} else {
+				a.enabled = false
+			}
+		}
+	} else {
+		a.enabled = false
+	}
+
+	return a
+}
+
+func (a *ApiKey) Handler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {								
+		if a.enabled && strings.ToUpper(r.Method) == "POST" {
+			
+			apiKey := r.Header.Get("x-api-key")
+			
+			if len(apiKey) == 0 || apiKey != a.key {
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				io.WriteString(w, `{"error":"invalid api key"}`)
+				return
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
 }
