@@ -3,7 +3,6 @@ package handler
 import (
 	"compress/flate"
 	"errors"
-	"io"
 	"math"
 	"net/http"
 	"os"
@@ -19,6 +18,7 @@ import (
 	"github.com/diwise/api-snowdepth/pkg/models"
 	"github.com/diwise/ngsi-ld-golang/pkg/datamodels/fiware"
 	ngsi "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld"
+	ngsierrors "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld/errors"
 	"github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld/types"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -84,9 +84,9 @@ func newRequestRouter() *RequestRouter {
 
 	// Enable gzip compression for ngsi-ld responses
 	compressor := middleware.NewCompressor(flate.DefaultCompression, "application/json", "application/ld+json", "application/geo+json")
+	router.impl.Use(newApiKeyMiddleware().Handler)
 	router.impl.Use(compressor.Handler)
 	router.impl.Use(middleware.Logger)
-	router.impl.Use(newApiKeyMiddleware().Handler)
 
 	return router
 }
@@ -242,37 +242,36 @@ type ApiKey struct {
 func newApiKeyMiddleware() *ApiKey {
 	a := &ApiKey{
 		enabled: false,
-		key: "",
+		key:     "",
 	}
 
 	if b, err := strconv.ParseBool(os.Getenv("DIWISE_REQUIRE_API_KEY")); err == nil {
 		if b {
+
 			a.enabled = true
 			validKey := os.Getenv("DIWISE_API_KEY")
+
+			log.Printf("Api key enabled! Key: %s", validKey)
 
 			if len(validKey) != 0 {
 				a.key = validKey
 			} else {
-				a.enabled = false
+				panic("Api-Key is missing or invalid. Ensure that DIWISE_API_KEY is set to a valid value")
 			}
 		}
-	} else {
-		a.enabled = false
 	}
 
 	return a
 }
 
 func (a *ApiKey) Handler(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {								
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if a.enabled && strings.ToUpper(r.Method) == "POST" {
-			
+
 			apiKey := r.Header.Get("x-api-key")
-			
+
 			if len(apiKey) == 0 || apiKey != a.key {
-				w.Header().Add("Content-Type", "application/json")
-				w.WriteHeader(http.StatusUnauthorized)
-				io.WriteString(w, `{"error":"invalid api key"}`)
+				ngsierrors.ReportUnauthorizedRequest(w, "Access denied. Invalid api-key found.")
 				return
 			}
 		}
