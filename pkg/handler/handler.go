@@ -251,8 +251,6 @@ func newApiKeyMiddleware() *ApiKey {
 			a.enabled = true
 			validKey := os.Getenv("DIWISE_API_KEY")
 
-			log.Printf("Api key enabled! Key: %s", validKey)
-
 			if len(validKey) != 0 {
 				a.key = validKey
 			} else {
