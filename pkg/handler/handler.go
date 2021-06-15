@@ -6,6 +6,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -17,6 +18,7 @@ import (
 	"github.com/diwise/api-snowdepth/pkg/models"
 	"github.com/diwise/ngsi-ld-golang/pkg/datamodels/fiware"
 	ngsi "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld"
+	ngsierrors "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld/errors"
 	"github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld/types"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -82,6 +84,7 @@ func newRequestRouter() *RequestRouter {
 
 	// Enable gzip compression for ngsi-ld responses
 	compressor := middleware.NewCompressor(flate.DefaultCompression, "application/json", "application/ld+json", "application/geo+json")
+	router.impl.Use(newApiKeyMiddleware().Handler)
 	router.impl.Use(compressor.Handler)
 	router.impl.Use(middleware.Logger)
 
@@ -229,4 +232,47 @@ func (cs contextSource) UpdateEntityAttributes(entityID string, req ngsi.Request
 
 func (cs contextSource) RetrieveEntity(entityID string, req ngsi.Request) (ngsi.Entity, error) {
 	return nil, errors.New("RetrieveEntity is not supported")
+}
+
+type ApiKey struct {
+	enabled bool
+	key     string
+}
+
+func newApiKeyMiddleware() *ApiKey {
+	a := &ApiKey{
+		enabled: false,
+		key:     "",
+	}
+
+	if b, err := strconv.ParseBool(os.Getenv("DIWISE_REQUIRE_API_KEY")); err == nil {
+		if b {
+
+			a.enabled = true
+			validKey := os.Getenv("DIWISE_API_KEY")
+
+			if len(validKey) != 0 {
+				a.key = validKey
+			} else {
+				panic("Api-Key is missing or invalid. Ensure that DIWISE_API_KEY is set to a valid value")
+			}
+		}
+	}
+
+	return a
+}
+
+func (a *ApiKey) Handler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if a.enabled && strings.ToUpper(r.Method) == "POST" {
+
+			apiKey := r.Header.Get("x-api-key")
+
+			if len(apiKey) == 0 || apiKey != a.key {
+				ngsierrors.ReportUnauthorizedRequest(w, "Access denied. Invalid api-key found.")
+				return
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
 }
