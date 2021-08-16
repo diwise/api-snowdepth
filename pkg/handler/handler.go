@@ -3,6 +3,7 @@ package handler
 import (
 	"compress/flate"
 	"errors"
+	"io/ioutil"
 	"math"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ import (
 	gql "github.com/diwise/api-snowdepth/internal/pkg/graphql"
 	"github.com/diwise/api-snowdepth/pkg/database"
 	"github.com/diwise/api-snowdepth/pkg/models"
+	"github.com/diwise/messaging-golang/pkg/messaging"
 	"github.com/diwise/ngsi-ld-golang/pkg/datamodels/fiware"
 	ngsi "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld"
 	ngsierrors "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld/errors"
@@ -44,11 +46,56 @@ func (router *RequestRouter) addGraphQLHandlers(db database.Datastore) {
 	router.impl.Handle("/api/graphql", gqlServer)
 }
 
-func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistry) {
+func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistry, mq messaging.Context) {
 	router.Get("/ngsi-ld/v1/entities", ngsi.NewQueryEntitiesHandler(contextRegistry))
 	router.Get("/ngsi-ld/v1/entities/{entity}", ngsi.NewRetrieveEntityHandler(contextRegistry))
-	router.Patch("/ngsi-ld/v1/entities/{entity}/attrs/", ngsi.NewUpdateEntityAttributesHandler(contextRegistry))
-	router.Post("/ngsi-ld/v1/entities", ngsi.NewCreateEntityHandler(contextRegistry))
+	router.Post(
+		"/ngsi-ld/v1/entities",
+		ngsi.NewCreateEntityHandlerWithCallback(
+			contextRegistry,
+			func(entityType, entityID string, request ngsi.Request) {
+				// Read the body from the POST request
+				body, _ := ioutil.ReadAll(request.Request().Body)
+				// Create and send an entity created message
+				ecm := &entityCreatedMessage{
+					EntityType: entityType,
+					EntityID:   entityID,
+					Body:       body,
+				}
+
+				err := mq.PublishOnTopic(ecm)
+
+				if err != nil {
+					log.Errorf("failed to post an entity created message to message queue: %s", err.Error())
+					return
+				}
+
+				log.Infof("posted an entity created event to %s", ecm.TopicName())
+			}))
+
+	router.Patch(
+		"/ngsi-ld/v1/entities/{entity}/attrs/",
+		ngsi.NewUpdateEntityAttributesHandlerWithCallback(
+			contextRegistry,
+			func(entityType, entityID string, request ngsi.Request) {
+				// Read the body from the PATCH request
+				body, _ := ioutil.ReadAll(request.Request().Body)
+				// Create and send an entity updated message
+				eum := &entityUpdatedMessage{
+					EntityType: entityType,
+					EntityID:   entityID,
+					Body:       body,
+				}
+
+				err := mq.PublishOnTopic(eum)
+
+				if err != nil {
+					log.Errorf("failed to post an entity updated message to message queue: %s", err.Error())
+					return
+				}
+
+				log.Infof("posted an entity updated event to %s", eum.TopicName())
+			}))
 }
 
 func (router *RequestRouter) addProbeHandlers() {
@@ -91,18 +138,18 @@ func newRequestRouter() *RequestRouter {
 	return router
 }
 
-func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datastore) *RequestRouter {
+func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datastore, mq messaging.Context) *RequestRouter {
 	router := newRequestRouter()
 
 	router.addGraphQLHandlers(db)
-	router.addNGSIHandlers(contextRegistry)
+	router.addNGSIHandlers(contextRegistry, mq)
 	router.addProbeHandlers()
 
 	return router
 }
 
 //CreateRouterAndStartServing creates a request router, registers all handlers and starts serving requests
-func CreateRouterAndStartServing(db database.Datastore) {
+func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context) {
 
 	contextRegistry := ngsi.NewContextRegistry()
 	ctxSource := contextSource{db: db}
@@ -159,7 +206,7 @@ func CreateRouterAndStartServing(db database.Datastore) {
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
-	router := createRequestRouter(contextRegistry, db)
+	router := createRequestRouter(contextRegistry, db, mq)
 
 	port := os.Getenv("SNOWDEPTH_API_PORT")
 	if port == "" {
@@ -211,6 +258,10 @@ func (cs contextSource) GetEntities(query ngsi.Query, callback ngsi.QueryEntitie
 	}
 
 	return err
+}
+
+func (cs contextSource) GetProvidedTypeFromID(entityID string) (string, error) {
+	return "", errors.New("not implemented")
 }
 
 func (cs contextSource) ProvidesAttribute(attributeName string) bool {
@@ -275,4 +326,34 @@ func (a *ApiKey) Handler(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+// TODO: Move these message types to a public messaging package that can be used by consumers
+
+type entityCreatedMessage struct {
+	EntityType string `json:"type"`
+	EntityID   string `json:"id"`
+	Body       []byte `json:"body"`
+}
+
+func (ecm *entityCreatedMessage) ContentType() string {
+	return "application/json"
+}
+
+func (ecm *entityCreatedMessage) TopicName() string {
+	return "ngsi-entity-created"
+}
+
+type entityUpdatedMessage struct {
+	EntityType string `json:"type"`
+	EntityID   string `json:"id"`
+	Body       []byte `json:"body"`
+}
+
+func (eum *entityUpdatedMessage) ContentType() string {
+	return "application/json"
+}
+
+func (eum *entityUpdatedMessage) TopicName() string {
+	return "ngsi-entity-updated"
 }

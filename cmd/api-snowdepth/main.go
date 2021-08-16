@@ -26,5 +26,5 @@ func main() {
 
 	messenger.RegisterTopicMessageHandler((&telemetry.Snowdepth{}).TopicName(), createSnowdepthReceiver(db))
 
-	handler.CreateRouterAndStartServing(db)
+	handler.CreateRouterAndStartServing(db, messenger)
 }
