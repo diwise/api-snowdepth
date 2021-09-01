@@ -60,7 +60,7 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 				ecm := &entityCreatedMessage{
 					EntityType: entityType,
 					EntityID:   entityID,
-					Body:       body,
+					Body:       string(body),
 				}
 
 				err := mq.PublishOnTopic(ecm)
@@ -84,7 +84,7 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 				eum := &entityUpdatedMessage{
 					EntityType: entityType,
 					EntityID:   entityID,
-					Body:       body,
+					Body:       string(body),
 				}
 
 				err := mq.PublishOnTopic(eum)
@@ -213,7 +213,7 @@ func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context) {
 		port = "8880"
 	}
 
-	log.Printf("Starting api-snowdepth on port %s.\n", port)
+	log.Infof("Starting api-snowdepth on port %s.\n", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, router.impl))
 }
@@ -242,7 +242,7 @@ func (cs contextSource) GetEntities(query ngsi.Query, callback ngsi.QueryEntitie
 	var err error
 
 	if query.HasDeviceReference() {
-		deviceID := strings.TrimPrefix(query.Device(), "urn:ngsi-ld:Device:")
+		deviceID := strings.TrimPrefix(query.Device(), fiware.DeviceIDPrefix)
 		snowdepths, err = cs.db.GetLatestSnowdepthsForDevice(deviceID)
 	} else {
 		snowdepths, err = cs.db.GetLatestSnowdepths()
@@ -333,7 +333,7 @@ func (a *ApiKey) Handler(next http.Handler) http.Handler {
 type entityCreatedMessage struct {
 	EntityType string `json:"type"`
 	EntityID   string `json:"id"`
-	Body       []byte `json:"body"`
+	Body       string `json:"body"`
 }
 
 func (ecm *entityCreatedMessage) ContentType() string {
@@ -347,7 +347,7 @@ func (ecm *entityCreatedMessage) TopicName() string {
 type entityUpdatedMessage struct {
 	EntityType string `json:"type"`
 	EntityID   string `json:"id"`
-	Body       []byte `json:"body"`
+	Body       string `json:"body"`
 }
 
 func (eum *entityUpdatedMessage) ContentType() string {

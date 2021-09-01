@@ -15,6 +15,7 @@ func main() {
 
 	serviceName := "api-snowdepth"
 
+	log.SetFormatter(&log.JSONFormatter{})
 	log.Infof("Starting up %s ...", serviceName)
 
 	config := messaging.LoadConfiguration(serviceName)

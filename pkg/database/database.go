@@ -77,7 +77,7 @@ func NewDatabaseConnection() (Datastore, error) {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s password=%s", dbHost, username, dbName, sslMode, password)
 
 	for {
-		log.Printf("Connecting to database host %s ...\n", dbHost)
+		log.Infof("Connecting to database host %s ...\n", dbHost)
 		conn, err := gorm.Open("postgres", dbURI)
 		if err != nil {
 			log.Fatalf("Failed to connect to database %s \n", err)
