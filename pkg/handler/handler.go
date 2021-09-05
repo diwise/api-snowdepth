@@ -70,7 +70,7 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 					return
 				}
 
-				log.Infof("posted an entity created event to %s", ecm.TopicName())
+				log.Infof("posted an entity created event to %s with body \"%s\"", ecm.TopicName(), ecm.Body)
 			}))
 
 	router.Patch(
@@ -94,7 +94,7 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 					return
 				}
 
-				log.Infof("posted an entity updated event to %s", eum.TopicName())
+				log.Infof("posted an entity updated event to %s with body \"%s\"", eum.TopicName(), eum.Body)
 			}))
 }
 
