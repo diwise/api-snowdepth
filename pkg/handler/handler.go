@@ -55,7 +55,7 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 			contextRegistry,
 			func(entityType, entityID string, request ngsi.Request) {
 				// Read the body from the POST request
-				body, _ := ioutil.ReadAll(request.Request().Body)
+				body, _ := ioutil.ReadAll(request.BodyReader())
 				// Create and send an entity created message
 				ecm := &entityCreatedMessage{
 					EntityType: entityType,
@@ -79,7 +79,7 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 			contextRegistry,
 			func(entityType, entityID string, request ngsi.Request) {
 				// Read the body from the PATCH request
-				body, _ := ioutil.ReadAll(request.Request().Body)
+				body, _ := ioutil.ReadAll(request.BodyReader())
 				// Create and send an entity updated message
 				eum := &entityUpdatedMessage{
 					EntityType: entityType,
