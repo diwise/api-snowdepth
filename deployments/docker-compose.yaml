@@ -26,7 +26,7 @@ services:
 
 
   deviceregistry:
-    image: 'ghcr.io/diwise/iot-device-registry:prod-80fc3d1307891da2494602f8b3766bcef59a7811'
+    image: 'ghcr.io/diwise/iot-device-registry@sha256:26466ab75b98586aeeaadae11d55b0b969463d76e5e5c5bf705d097f4c43301e'
     restart: always
     environment:
       DIWISE_SQLDB_HOST: 'postgresdb'
@@ -52,7 +52,7 @@ services:
 
 
   ingress:
-    image: 'ghcr.io/diwise/ingress-mqtt:prod-353b078e5db37a6e681ee67b21cf16e41703da70'
+    image: 'ghcr.io/diwise/ingress-mqtt@sha256:b1c717c5a9c3863c267c45b56fe57ffd6a5e056070cd594d7744790f1c1fa7e3'
     restart: always
     depends_on:
       - snowdepth
@@ -64,6 +64,7 @@ services:
       MQTT_TOPIC: $MQTT_TOPIC
       MQTT_USER: $MQTT_USER
       MQTT_PASSWORD: $MQTT_PASSWORD
+      DIWISE_CONTEXT_BROKER_URL: 'http://snowdepth:8282'
       RABBITMQ_HOST: 'rabbitmq'
       RABBITMQ_USER: 'user'
       RABBITMQ_PASSWORD: 'bitnami'
