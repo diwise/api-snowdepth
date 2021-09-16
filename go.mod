@@ -6,7 +6,8 @@ require (
 	github.com/99designs/gqlgen v0.13.0
 	github.com/diwise/messaging-golang v0.0.0-20210519125901-747dbe4d4b42
 	github.com/diwise/ngsi-ld-golang v0.0.0-20210905143258-4c2bfb33ab19
-	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/chi/v5 v5.0.4
+	github.com/go-chi/httplog v0.2.0
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lib/pq v1.10.2 // indirect

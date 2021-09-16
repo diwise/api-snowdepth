@@ -22,8 +22,9 @@ import (
 	ngsi "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld"
 	ngsierrors "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld/errors"
 	"github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld/types"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httplog"
 	"github.com/rs/cors"
 
 	log "github.com/sirupsen/logrus"
@@ -133,7 +134,11 @@ func newRequestRouter() *RequestRouter {
 	compressor := middleware.NewCompressor(flate.DefaultCompression, "application/json", "application/ld+json", "application/geo+json")
 	router.impl.Use(newApiKeyMiddleware().Handler)
 	router.impl.Use(compressor.Handler)
-	router.impl.Use(middleware.Logger)
+
+	logger := httplog.NewLogger("api-snowdepth", httplog.Options{
+		JSON: true,
+	})
+	router.impl.Use(httplog.RequestLogger(logger))
 
 	return router
 }
