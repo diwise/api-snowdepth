@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -50,7 +50,7 @@ func GetFromContext(ctx context.Context) (Datastore, error) {
 		return db, nil
 	}
 
-	return nil, errors.New("Failed to decode database from context")
+	return nil, errors.New("failed to decode database from context")
 }
 
 type myDB struct {
@@ -65,7 +65,7 @@ func getEnv(key, fallback string) string {
 }
 
 //NewDatabaseConnection initializes a new connection to the database and wraps it in a Datastore
-func NewDatabaseConnection() (Datastore, error) {
+func NewDatabaseConnection(logger zerolog.Logger) (Datastore, error) {
 	db := &myDB{}
 
 	dbHost := os.Getenv("SNOWDEPTH_DB_HOST")
@@ -77,10 +77,10 @@ func NewDatabaseConnection() (Datastore, error) {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s password=%s", dbHost, username, dbName, sslMode, password)
 
 	for {
-		log.Infof("Connecting to database host %s ...\n", dbHost)
+		logger.Info().Str("host", dbHost).Msg("Connecting to database host ...\n")
 		conn, err := gorm.Open("postgres", dbURI)
 		if err != nil {
-			log.Fatalf("Failed to connect to database %s \n", err)
+			logger.Fatal().Err(err).Msg("failed to connect to database")
 			time.Sleep(3 * time.Second)
 		} else {
 			db.impl = conn.Debug()

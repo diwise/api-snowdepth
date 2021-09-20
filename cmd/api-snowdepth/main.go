@@ -1,9 +1,9 @@
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
+	"strings"
 
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/rs/zerolog/log"
 
 	"github.com/diwise/api-snowdepth/pkg/database"
 	"github.com/diwise/api-snowdepth/pkg/handler"
@@ -15,17 +15,18 @@ func main() {
 
 	serviceName := "api-snowdepth"
 
-	log.SetFormatter(&log.JSONFormatter{})
-	log.Infof("Starting up %s ...", serviceName)
+	logger := log.With().Str("service", strings.ToLower(serviceName)).Logger()
 
-	config := messaging.LoadConfiguration(serviceName)
+	logger.Info().Msg("starting up ...")
+
+	config := messaging.LoadConfiguration(serviceName, logger)
 	messenger, _ := messaging.Initialize(config)
 
 	defer messenger.Close()
 
-	db, _ := database.NewDatabaseConnection()
+	db, _ := database.NewDatabaseConnection(logger)
 
 	messenger.RegisterTopicMessageHandler((&telemetry.Snowdepth{}).TopicName(), createSnowdepthReceiver(db))
 
-	handler.CreateRouterAndStartServing(db, messenger)
+	handler.CreateRouterAndStartServing(db, messenger, logger)
 }

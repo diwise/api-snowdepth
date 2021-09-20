@@ -26,8 +26,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog"
 	"github.com/rs/cors"
-
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 //RequestRouter wraps the concrete router implementation
@@ -47,14 +46,15 @@ func (router *RequestRouter) addGraphQLHandlers(db database.Datastore) {
 	router.impl.Handle("/api/graphql", gqlServer)
 }
 
-func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistry, mq messaging.Context) {
+func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistry, mq messaging.Context, logger zerolog.Logger) {
 	router.Get("/ngsi-ld/v1/entities", ngsi.NewQueryEntitiesHandler(contextRegistry))
 	router.Get("/ngsi-ld/v1/entities/{entity}", ngsi.NewRetrieveEntityHandler(contextRegistry))
 	router.Post(
 		"/ngsi-ld/v1/entities",
 		ngsi.NewCreateEntityHandlerWithCallback(
 			contextRegistry,
-			func(entityType, entityID string, request ngsi.Request) {
+			logger,
+			func(entityType, entityID string, request ngsi.Request, sublog zerolog.Logger) {
 				// Read the body from the POST request
 				body, _ := ioutil.ReadAll(request.BodyReader())
 				// Create and send an entity created message
@@ -66,19 +66,22 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 
 				err := mq.PublishOnTopic(ecm)
 
+				sublog = sublog.With().Str("topic", ecm.TopicName()).Logger()
+
 				if err != nil {
-					log.Errorf("failed to post an entity created message to message queue: %s", err.Error())
+					sublog.Error().Err(err).Msg("failed to post an entity created message")
 					return
 				}
 
-				log.Infof("posted an entity created event to %s with body \"%s\"", ecm.TopicName(), ecm.Body)
+				sublog.Info().Str("body", ecm.Body).Msg("posted an entity created event")
 			}))
 
 	router.Patch(
 		"/ngsi-ld/v1/entities/{entity}/attrs/",
 		ngsi.NewUpdateEntityAttributesHandlerWithCallback(
 			contextRegistry,
-			func(entityType, entityID string, request ngsi.Request) {
+			logger,
+			func(entityType, entityID string, request ngsi.Request, sublog zerolog.Logger) {
 				// Read the body from the PATCH request
 				body, _ := ioutil.ReadAll(request.BodyReader())
 				// Create and send an entity updated message
@@ -90,12 +93,14 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 
 				err := mq.PublishOnTopic(eum)
 
+				sublog = sublog.With().Str("topic", eum.TopicName()).Logger()
+
 				if err != nil {
-					log.Errorf("failed to post an entity updated message to message queue: %s", err.Error())
+					sublog.Error().Err(err).Msg("failed to post an entity updated message")
 					return
 				}
 
-				log.Infof("posted an entity updated event to %s with body \"%s\"", eum.TopicName(), eum.Body)
+				sublog.Info().Str("body", eum.Body).Msg("posted an entity updated event")
 			}))
 }
 
@@ -143,18 +148,18 @@ func newRequestRouter() *RequestRouter {
 	return router
 }
 
-func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datastore, mq messaging.Context) *RequestRouter {
+func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datastore, mq messaging.Context, logger zerolog.Logger) *RequestRouter {
 	router := newRequestRouter()
 
 	router.addGraphQLHandlers(db)
-	router.addNGSIHandlers(contextRegistry, mq)
+	router.addNGSIHandlers(contextRegistry, mq, logger)
 	router.addProbeHandlers()
 
 	return router
 }
 
 //CreateRouterAndStartServing creates a request router, registers all handlers and starts serving requests
-func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context) {
+func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context, logger zerolog.Logger) {
 
 	contextRegistry := ngsi.NewContextRegistry()
 	ctxSource := contextSource{db: db}
@@ -211,16 +216,19 @@ func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context) {
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
-	router := createRequestRouter(contextRegistry, db, mq)
+	router := createRequestRouter(contextRegistry, db, mq, logger)
 
 	port := os.Getenv("SNOWDEPTH_API_PORT")
 	if port == "" {
 		port = "8880"
 	}
 
-	log.Infof("Starting api-snowdepth on port %s.\n", port)
+	logger.Info().Str("port", port).Msg("listening for incoming connections")
 
-	log.Fatal(http.ListenAndServe(":"+port, router.impl))
+	err := http.ListenAndServe(":"+port, router.impl)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed to start listening on port")
+	}
 }
 
 type contextSource struct {

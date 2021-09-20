@@ -4,8 +4,8 @@ go 1.16
 
 require (
 	github.com/99designs/gqlgen v0.13.0
-	github.com/diwise/messaging-golang v0.0.0-20210519125901-747dbe4d4b42
-	github.com/diwise/ngsi-ld-golang v0.0.0-20210905143258-4c2bfb33ab19
+	github.com/diwise/messaging-golang v0.0.0-20210920190500-4f3730cc42af
+	github.com/diwise/ngsi-ld-golang v0.0.0-20210920201605-0bacc41cbc3a
 	github.com/go-chi/chi/v5 v5.0.4
 	github.com/go-chi/httplog v0.2.0
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
@@ -14,8 +14,9 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/rs/cors v1.8.0
-	github.com/sirupsen/logrus v1.8.1
+	github.com/rs/zerolog v1.25.0
 	github.com/streadway/amqp v1.0.0
+	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.2.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
