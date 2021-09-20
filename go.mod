@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/99designs/gqlgen v0.13.0
 	github.com/diwise/messaging-golang v0.0.0-20210920190500-4f3730cc42af
-	github.com/diwise/ngsi-ld-golang v0.0.0-20210920201605-0bacc41cbc3a
+	github.com/diwise/ngsi-ld-golang v0.0.0-20210920211437-fe3883cb7dcd
 	github.com/go-chi/chi/v5 v5.0.4
 	github.com/go-chi/httplog v0.2.0
 	github.com/hashicorp/golang-lru v0.5.4 // indirect

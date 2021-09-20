@@ -22,8 +22,8 @@ github.com/dgryski/trifles v0.0.0-20190318185328-a8d75aae118c h1:TUuUh0Xgj97tLMN
 github.com/dgryski/trifles v0.0.0-20190318185328-a8d75aae118c/go.mod h1:if7Fbed8SFyPtHLHbg49SI7NAdJiC5WIA09pe59rfAA=
 github.com/diwise/messaging-golang v0.0.0-20210920190500-4f3730cc42af h1:iL3z1R46bMK2yVN5/p3bhvztOMMIC3OLVnmsWlcY/Xg=
 github.com/diwise/messaging-golang v0.0.0-20210920190500-4f3730cc42af/go.mod h1:B1QTtDaHO/BQctznTIhmfZwfvhJJZu7Ku+vPf/nUL7k=
-github.com/diwise/ngsi-ld-golang v0.0.0-20210920201605-0bacc41cbc3a h1:EPfAWZ9SlnYoH+FPatRN5BJPw9LUAsJA8XgCIHdTBT8=
-github.com/diwise/ngsi-ld-golang v0.0.0-20210920201605-0bacc41cbc3a/go.mod h1:GLNRrYVBgug34POOdKCrbZ+7zpwDGz2iTf1cAex7/YM=
+github.com/diwise/ngsi-ld-golang v0.0.0-20210920211437-fe3883cb7dcd h1:p5Qau7vzxEFh6E7eJogPOcU4/27Xn/Dk9Q3iqEf1T6A=
+github.com/diwise/ngsi-ld-golang v0.0.0-20210920211437-fe3883cb7dcd/go.mod h1:GLNRrYVBgug34POOdKCrbZ+7zpwDGz2iTf1cAex7/YM=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 h1:Yzb9+7DPaBjB8zlTR87/ElzFsnQfuHnVUVqpZZIcV5Y=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5/go.mod h1:a2zkGnVExMxdzMo3M0Hi/3sEU+cWnZpSni0O6/Yb/P0=
 github.com/gin-contrib/sse v0.1.0/go.mod h1:RHrZQHXnP2xjPF+u1gW/2HnVO7nvIa9PG3Gm+fLHvGI=
