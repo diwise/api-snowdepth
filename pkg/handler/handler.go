@@ -216,6 +216,12 @@ func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context, lo
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
+	remoteURL = os.Getenv("NGSI_CTX_SRC_SMARTWATER")
+	regex = "^urn:ngsi-ld:WaterConsumptionObserved:.+"
+	registration, _ = ngsi.NewCsourceRegistration("WaterConsumptionObserved", []string{}, remoteURL, &regex)
+	contextSource, _ = ngsi.NewRemoteContextSource(registration)
+	contextRegistry.Register(contextSource)
+
 	router := createRequestRouter(contextRegistry, db, mq, logger)
 
 	port := os.Getenv("SNOWDEPTH_API_PORT")
