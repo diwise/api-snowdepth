@@ -170,6 +170,10 @@ func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context, lo
 	contextSource, _ := ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
+	registration, _ = ngsi.NewCsourceRegistration("ExerciseTrail", []string{}, remoteURL, nil)
+	contextSource, _ = ngsi.NewRemoteContextSource(registration)
+	contextRegistry.Register(contextSource)
+
 	remoteURL = os.Getenv("NGSI_CTX_SRC_PROBLEMREPORT")
 	registration, _ = ngsi.NewCsourceRegistration("Open311ServiceRequest", []string{"service_code"}, remoteURL, nil)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
