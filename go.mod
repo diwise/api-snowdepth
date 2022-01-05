@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/99designs/gqlgen v0.14.0
 	github.com/diwise/messaging-golang v0.0.0-20211111104545-866f008942ef
-	github.com/diwise/ngsi-ld-golang v0.0.0-20220104160625-c02bbf43c08b
+	github.com/diwise/ngsi-ld-golang v0.0.0-20220105132415-d5a9f42c7645
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/httplog v0.2.1
 	github.com/jinzhu/gorm v1.9.16

@@ -18,6 +18,7 @@ import (
 	"github.com/diwise/api-snowdepth/pkg/database"
 	"github.com/diwise/api-snowdepth/pkg/models"
 	"github.com/diwise/messaging-golang/pkg/messaging"
+	"github.com/diwise/ngsi-ld-golang/pkg/datamodels/diwise"
 	"github.com/diwise/ngsi-ld-golang/pkg/datamodels/fiware"
 	ngsi "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld"
 	ngsierrors "github.com/diwise/ngsi-ld-golang/pkg/ngsi-ld/errors"
@@ -166,63 +167,68 @@ func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context, lo
 	contextRegistry.Register(ctxSource)
 
 	remoteURL := os.Getenv("NGSI_CTX_SRC_POINTOFINTEREST")
-	registration, _ := ngsi.NewCsourceRegistration("Beach", []string{}, remoteURL, nil)
+	regex := "^urn:ngsi-ld:Beach:.+"
+	registration, _ := ngsi.NewCsourceRegistration(fiware.BeachTypeName, []string{}, remoteURL, &regex)
 	contextSource, _ := ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
-	registration, _ = ngsi.NewCsourceRegistration("ExerciseTrail", []string{}, remoteURL, nil)
+	regex = "^urn:ngsi-ld:ExerciseTrail:.+"
+	registration, _ = ngsi.NewCsourceRegistration(diwise.ExerciseTrailTypeName, []string{}, remoteURL, &regex)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	remoteURL = os.Getenv("NGSI_CTX_SRC_PROBLEMREPORT")
-	registration, _ = ngsi.NewCsourceRegistration("Open311ServiceRequest", []string{"service_code"}, remoteURL, nil)
+	registration, _ = ngsi.NewCsourceRegistration(fiware.Open311ServiceRequestTypeName, []string{"service_code"}, remoteURL, nil)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	remoteURL = os.Getenv("NGSI_CTX_SRC_TEMPERATURE")
-	registration, _ = ngsi.NewCsourceRegistration("WeatherObserved", []string{"temperature"}, remoteURL, nil)
+	registration, _ = ngsi.NewCsourceRegistration(fiware.WeatherObservedTypeName, []string{"temperature"}, remoteURL, nil)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
-	registration, _ = ngsi.NewCsourceRegistration("WaterQualityObserved", []string{"temperature"}, remoteURL, nil)
+	registration, _ = ngsi.NewCsourceRegistration(fiware.WaterQualityObservedTypeName, []string{"temperature"}, remoteURL, nil)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	remoteURL = os.Getenv("NGSI_CTX_SRC_TRANSPORTATION")
-	regex := "^urn:ngsi-ld:Road:.+"
-	registration, _ = ngsi.NewCsourceRegistration("Road", []string{}, remoteURL, &regex)
+	regex = "^urn:ngsi-ld:Road:.+"
+	registration, _ = ngsi.NewCsourceRegistration(fiware.RoadTypeName, []string{}, remoteURL, &regex)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	regex = "^urn:ngsi-ld:RoadSegment:.+"
-	registration, _ = ngsi.NewCsourceRegistration("RoadSegment", []string{}, remoteURL, &regex)
+	registration, _ = ngsi.NewCsourceRegistration(fiware.RoadSegmentTypeName, []string{}, remoteURL, &regex)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	regex = "^urn:ngsi-ld:RoadSurfaceObserved:.+"
-	registration, _ = ngsi.NewCsourceRegistration("RoadSurfaceObserved", []string{}, remoteURL, &regex)
+	registration, _ = ngsi.NewCsourceRegistration(diwise.RoadSurfaceObservedTypeName, []string{}, remoteURL, &regex)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	regex = "^urn:ngsi-ld:TrafficFlowObserved:.+"
-	registration, _ = ngsi.NewCsourceRegistration("TrafficFlowObserved", []string{}, remoteURL, &regex)
+	registration, _ = ngsi.NewCsourceRegistration(fiware.TrafficFlowObservedTypeName, []string{}, remoteURL, &regex)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	remoteURL = os.Getenv("NGSI_CTX_SRC_DEVICES")
 	regex = "^urn:ngsi-ld:Device:.+"
-	registration, _ = ngsi.NewCsourceRegistration("Device", []string{"value"}, remoteURL, &regex)
+	registration, _ = ngsi.NewCsourceRegistration(fiware.DeviceTypeName, []string{"value"}, remoteURL, &regex)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	regex = "^urn:ngsi-ld:DeviceModel:.+"
-	registration, _ = ngsi.NewCsourceRegistration("DeviceModel", []string{}, remoteURL, &regex)
+	registration, _ = ngsi.NewCsourceRegistration(fiware.DeviceModelTypeName, []string{}, remoteURL, &regex)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
 	remoteURL = os.Getenv("NGSI_CTX_SRC_SMARTWATER")
 	regex = "^urn:ngsi-ld:WaterConsumptionObserved:.+"
-	registration, _ = ngsi.NewCsourceRegistration("WaterConsumptionObserved", []string{}, remoteURL, &regex)
+	registration, _ = ngsi.NewCsourceRegistration(
+		fiware.WaterConsumptionObservedTypeName,
+		[]string{}, remoteURL, &regex,
+	)
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
