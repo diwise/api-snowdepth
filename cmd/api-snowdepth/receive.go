@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog"
-	"github.com/streadway/amqp"
 
 	"github.com/diwise/api-snowdepth/pkg/database"
 	"github.com/diwise/messaging-golang/pkg/messaging"
