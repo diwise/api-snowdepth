@@ -232,6 +232,12 @@ func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context, lo
 	contextSource, _ = ngsi.NewRemoteContextSource(registration)
 	contextRegistry.Register(contextSource)
 
+	remoteURL = os.Getenv("NGSI_CTX_SRC_ENVIRONMENT")
+	regex = "^urn:ngsi-ld:AirQualityObserved:.+"
+	registration, _ = ngsi.NewCsourceRegistration(fiware.AirQualityObservedTypeName, []string{}, remoteURL, &regex)
+	contextSource, _ = ngsi.NewRemoteContextSource(registration)
+	contextRegistry.Register(contextSource)
+
 	router := createRequestRouter(contextRegistry, db, mq, logger)
 
 	port := os.Getenv("SNOWDEPTH_API_PORT")

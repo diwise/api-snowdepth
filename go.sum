@@ -24,6 +24,8 @@ github.com/diwise/messaging-golang v0.0.0-20211111104545-866f008942ef h1:gnCwANB
 github.com/diwise/messaging-golang v0.0.0-20211111104545-866f008942ef/go.mod h1:lJ1ZkpZleRmvOTC/vSW4ZGQGxjvuxpoowB/9p8V5oJM=
 github.com/diwise/ngsi-ld-golang v0.0.0-20220107175243-ec4570c83cdd h1:0xjSplmYZCzpRC4EctC0e+NAMgTVg7/hyAO/ZDycdy8=
 github.com/diwise/ngsi-ld-golang v0.0.0-20220107175243-ec4570c83cdd/go.mod h1:rJEtJBmPwq3c+0leOb2Zy/u/Z9eTIT8RJQFyGJzoMrM=
+github.com/diwise/ngsi-ld-golang v0.0.0-20220120163509-3f491aa07e3c h1:y2zN1toGZHAa6NSojJagHh81UrgxAUR/T/hmaAPFrLg=
+github.com/diwise/ngsi-ld-golang v0.0.0-20220120163509-3f491aa07e3c/go.mod h1:rJEtJBmPwq3c+0leOb2Zy/u/Z9eTIT8RJQFyGJzoMrM=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 h1:Yzb9+7DPaBjB8zlTR87/ElzFsnQfuHnVUVqpZZIcV5Y=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5/go.mod h1:a2zkGnVExMxdzMo3M0Hi/3sEU+cWnZpSni0O6/Yb/P0=
 github.com/go-chi/chi/v5 v5.0.0/go.mod h1:BBug9lr0cqtdAhsu6R4AAdvufI0/XBzAQSsUqJpoZOs=
