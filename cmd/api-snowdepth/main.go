@@ -26,7 +26,10 @@ func main() {
 
 	db, _ := database.NewDatabaseConnection(logger)
 
-	messenger.RegisterTopicMessageHandler((&telemetry.Snowdepth{}).TopicName(), createSnowdepthReceiver(db))
+	topicName := (&telemetry.Snowdepth{}).TopicName()
+	logger.Info().Msgf("registering message handler for topic %s", topicName)
+	messenger.RegisterTopicMessageHandler(topicName, createSnowdepthReceiver(db))
 
+	logger.Info().Msg("calling CreateRouterAndStartServing")
 	handler.CreateRouterAndStartServing(db, messenger, logger)
 }
