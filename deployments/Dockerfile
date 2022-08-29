@@ -1,4 +1,4 @@
-FROM golang:1.17 AS builder
+FROM golang:1.18 AS builder
 
 LABEL org.opencontainers.image.source https://github.com/diwise/api-snowdepth
 

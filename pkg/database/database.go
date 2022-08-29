@@ -16,7 +16,7 @@ import (
 	"github.com/diwise/api-snowdepth/pkg/models"
 )
 
-//Datastore is an interface that is used to inject the database into different handlers to improve testability
+// Datastore is an interface that is used to inject the database into different handlers to improve testability
 type Datastore interface {
 	AddManualSnowdepthMeasurement(latitude, longitude, depth float64) (*models.Snowdepth, error)
 	AddSnowdepthMeasurement(device *string, latitude, longitude, depth float64, when string) (*models.Snowdepth, error)
@@ -43,7 +43,7 @@ func Middleware(db Datastore) func(http.Handler) http.Handler {
 	}
 }
 
-//GetFromContext extracts the database wrapper, if any, from the provided context
+// GetFromContext extracts the database wrapper, if any, from the provided context
 func GetFromContext(ctx context.Context) (Datastore, error) {
 	db, ok := ctx.Value(dbCtxKey).(Datastore)
 	if ok {
@@ -64,7 +64,7 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-//NewDatabaseConnection initializes a new connection to the database and wraps it in a Datastore
+// NewDatabaseConnection initializes a new connection to the database and wraps it in a Datastore
 func NewDatabaseConnection(logger zerolog.Logger) (Datastore, error) {
 	db := &myDB{}
 
@@ -76,30 +76,30 @@ func NewDatabaseConnection(logger zerolog.Logger) (Datastore, error) {
 
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s password=%s", dbHost, username, dbName, sslMode, password)
 
-	for {
-		logger.Info().Str("host", dbHost).Msg("Connecting to database host ...\n")
-		conn, err := gorm.Open("postgres", dbURI)
-		if err != nil {
-			logger.Fatal().Err(err).Msg("failed to connect to database")
-			time.Sleep(3 * time.Second)
-		} else {
-			db.impl = conn.Debug()
-			db.impl.AutoMigrate(&models.Snowdepth{})
-			break
-		}
-		defer conn.Close()
+	logger.Info().Str("host", dbHost).Msg("Connecting to database host ...")
+	conn, err := gorm.Open("postgres", dbURI)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to connect to database")
+		logger.Fatal().Msg("exiting")
 	}
+	defer conn.Close()
+
+	db.impl = conn.Debug()
+	logger.Info().Msg("executing migrations ...")
+	db.impl.AutoMigrate(&models.Snowdepth{})
+
+	logger.Info().Msg("done")
 
 	return db, nil
 }
 
-//AddManualSnowdepthMeasurement takes a position and a depth and adds a record to the database
+// AddManualSnowdepthMeasurement takes a position and a depth and adds a record to the database
 func (db *myDB) AddManualSnowdepthMeasurement(latitude, longitude, depth float64) (*models.Snowdepth, error) {
 	t := time.Now().UTC()
 	return db.AddSnowdepthMeasurement(nil, latitude, longitude, depth, t.Format(time.RFC3339))
 }
 
-//AddSnowdepthMeasurement takes a device, position and a depth and adds a record to the database
+// AddSnowdepthMeasurement takes a device, position and a depth and adds a record to the database
 func (db *myDB) AddSnowdepthMeasurement(device *string, latitude, longitude, depth float64, when string) (*models.Snowdepth, error) {
 
 	measurement := &models.Snowdepth{
@@ -118,8 +118,8 @@ func (db *myDB) AddSnowdepthMeasurement(device *string, latitude, longitude, dep
 	return measurement, nil
 }
 
-//GetLatestSnowdepths returns the most recent value for all sensors, as well as
-//all manually added values during the last 24 hours
+// GetLatestSnowdepths returns the most recent value for all sensors, as well as
+// all manually added values during the last 24 hours
 func (db *myDB) GetLatestSnowdepths() ([]models.Snowdepth, error) {
 
 	// Get depths from the last 24 hours

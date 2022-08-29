@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -12,7 +13,7 @@ import (
 )
 
 func createSnowdepthReceiver(db database.Datastore) messaging.TopicMessageHandler {
-	return func(msg amqp.Delivery, logger zerolog.Logger) {
+	return func(ctx context.Context, msg amqp.Delivery, logger zerolog.Logger) {
 
 		logger.Info().Str("body", string(msg.Body)).Msg("message received from queue")
 

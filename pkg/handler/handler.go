@@ -3,7 +3,7 @@ package handler
 import (
 	"compress/flate"
 	"errors"
-	"io/ioutil"
+	"io"
 	"math"
 	"net/http"
 	"os"
@@ -30,7 +30,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-//RequestRouter wraps the concrete router implementation
+// RequestRouter wraps the concrete router implementation
 type RequestRouter struct {
 	impl *chi.Mux
 }
@@ -47,7 +47,7 @@ func (router *RequestRouter) addGraphQLHandlers(db database.Datastore) {
 	router.impl.Handle("/api/graphql", gqlServer)
 }
 
-func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistry, mq messaging.Context, logger zerolog.Logger) {
+func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistry, mq messaging.MsgContext, logger zerolog.Logger) {
 	router.Get("/ngsi-ld/v1/entities", ngsi.NewQueryEntitiesHandler(contextRegistry))
 	router.Get("/ngsi-ld/v1/entities/{entity}", ngsi.NewRetrieveEntityHandler(contextRegistry))
 	router.Post(
@@ -57,7 +57,7 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 			logger,
 			func(entityType, entityID string, request ngsi.Request, sublog zerolog.Logger) {
 				// Read the body from the POST request
-				body, _ := ioutil.ReadAll(request.BodyReader())
+				body, _ := io.ReadAll(request.BodyReader())
 				// Create and send an entity created message
 				ecm := &entityCreatedMessage{
 					EntityType: entityType,
@@ -65,7 +65,8 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 					Body:       string(body),
 				}
 
-				err := mq.PublishOnTopic(ecm)
+				ctx := request.Request().Context()
+				err := mq.PublishOnTopic(ctx, ecm)
 
 				sublog = sublog.With().Str("topic", ecm.TopicName()).Logger()
 
@@ -84,7 +85,7 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 			logger,
 			func(entityType, entityID string, request ngsi.Request, sublog zerolog.Logger) {
 				// Read the body from the PATCH request
-				body, _ := ioutil.ReadAll(request.BodyReader())
+				body, _ := io.ReadAll(request.BodyReader())
 				// Create and send an entity updated message
 				eum := &entityUpdatedMessage{
 					EntityType: entityType,
@@ -92,7 +93,8 @@ func (router *RequestRouter) addNGSIHandlers(contextRegistry ngsi.ContextRegistr
 					Body:       string(body),
 				}
 
-				err := mq.PublishOnTopic(eum)
+				ctx := request.Request().Context()
+				err := mq.PublishOnTopic(ctx, eum)
 
 				sublog = sublog.With().Str("topic", eum.TopicName()).Logger()
 
@@ -111,22 +113,22 @@ func (router *RequestRouter) addProbeHandlers() {
 	})
 }
 
-//Get accepts a pattern that should be routed to the handlerFn on a GET request
+// Get accepts a pattern that should be routed to the handlerFn on a GET request
 func (router *RequestRouter) Get(pattern string, handlerFn http.HandlerFunc) {
 	router.impl.Get(pattern, handlerFn)
 }
 
-//Patch accepts a pattern that should be routed to the handlerFn on a PATCH request
+// Patch accepts a pattern that should be routed to the handlerFn on a PATCH request
 func (router *RequestRouter) Patch(pattern string, handlerFn http.HandlerFunc) {
 	router.impl.Patch(pattern, handlerFn)
 }
 
-//Post accepts a pattern that should be routed to the handlerFn on a POST request
+// Post accepts a pattern that should be routed to the handlerFn on a POST request
 func (router *RequestRouter) Post(pattern string, handlerFn http.HandlerFunc) {
 	router.impl.Post(pattern, handlerFn)
 }
 
-//newRequestRouter creates and returns a new router wrapper
+// newRequestRouter creates and returns a new router wrapper
 func newRequestRouter() *RequestRouter {
 	router := &RequestRouter{impl: chi.NewRouter()}
 
@@ -149,7 +151,7 @@ func newRequestRouter() *RequestRouter {
 	return router
 }
 
-func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datastore, mq messaging.Context, logger zerolog.Logger) *RequestRouter {
+func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datastore, mq messaging.MsgContext, logger zerolog.Logger) *RequestRouter {
 	router := newRequestRouter()
 
 	router.addGraphQLHandlers(db)
@@ -159,8 +161,8 @@ func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datas
 	return router
 }
 
-//CreateRouterAndStartServing creates a request router, registers all handlers and starts serving requests
-func CreateRouterAndStartServing(db database.Datastore, mq messaging.Context, logger zerolog.Logger) {
+// CreateRouterAndStartServing creates a request router, registers all handlers and starts serving requests
+func CreateRouterAndStartServing(db database.Datastore, mq messaging.MsgContext, logger zerolog.Logger) {
 
 	contextRegistry := ngsi.NewContextRegistry()
 	ctxSource := contextSource{db: db}
